@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+
+"""
+takes DIPs extracted from Archivematica via the create DIPs automation tools, and extracts the zips. 
+All the files, except for the objects files and METS are deleted.
+
+""" 
+
 import zipfile
 import os
 import shutil

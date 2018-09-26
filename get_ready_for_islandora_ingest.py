@@ -1,7 +1,12 @@
-# prepares objects for ingest through the islandora api rest ingestor. this is the third step in transfering files from archivematica to islandora, and comes after crosswalking the 
-#METS files from Archivematica to MODS for islandora. This script creates numbered subdirectories for compound objects like newspapers, etc and create a simple mods file for each file
-#in the numbered subfolder with just the title field populated with information from the filename. All the files are renamed to OBJ as specified in the Islandora API and empty directories
-#are deleted. 
+#!/usr/bin/env python
+
+"""
+prepares objects for ingest through the Islandora api rest ingestor. This is the third step in transfering files from archivematica to islandora, and comes after crosswalking the 
+METS files from Archivematica to MODS for Islandora. This script creates numbered subdirectories for compound objects like newspapers, etc and create a simple mods file for each file
+in the numbered subfolder with just the title field populated with information from the filename. All the files are renamed to OBJ as specified for the Islandora Rest Ingestor and empty directories
+are deleted. 
+
+"""
 
 import os
 import shutil
