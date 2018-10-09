@@ -71,7 +71,8 @@ def write_to_xml(current_file, numbered_sub_folder):
 # creates a title for the file in the subfolder using regex regular expressions to include either a string following a 
 #capitalized word or a page number. This is not perfect so check the titles as they are printed out. Replaces the objects
 #parent title with the title for filename in the MODS.xml. All other metadata stays the same.
-    ns = {'mods' : 'http://www.loc.gov/mods/v3'}
+    ns = {'mods' : 'http://www.loc.gov/mods/v3',
+          'edt' :  'http://www.ndltd.org/standards/metadata/etdms/1.0'}
 
 
     regex = '([A-Z])\w+[^.]*|p\d{2,3}|pg\d{2,3}'
