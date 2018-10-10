@@ -42,7 +42,7 @@ def find_sub_folders(dirPath):
                     number_of_files = len(list_of_files)
 
                     if number_of_files < 2:
-                        pass
+                        break
                     else:   
                         folder_name = 0
                         while folder_name < number_of_files:
@@ -70,9 +70,13 @@ def make_sub_folders(new_dir_name):
 def write_to_xml(current_file, numbered_sub_folder):
 # creates a title for the file in the subfolder using regex regular expressions to include either a string following a 
 #capitalized word or a page number. This is not perfect so check the titles as they are printed out. Replaces the objects
-#parent title with the title for filename in the MODS.xml. All other metadata stays the same.
+#parent title with the title for filename in the MODS.xml. All other metadata stays the same. 
+#TO DO: MAKE GENRE/CMODEL/PATTER A DICTIONARY
     ns = {'mods' : 'http://www.loc.gov/mods/v3',
           'edt' :  'http://www.ndltd.org/standards/metadata/etdms/1.0'}
+    pattern = '*.pdf'
+    genre_type = "thesis"
+    thesis_text = "ir:thesisCModel" 
 
 
     regex = '([A-Z])\w+[^.]*|p\d{2,3}|pg\d{2,3}'
@@ -85,16 +89,31 @@ def write_to_xml(current_file, numbered_sub_folder):
     title = MD.find('mods:titleInfo/mods:title', ns)
     title.text = title_of_file.group(0)
     MD.write(numbered_sub_folder + '/MODS.xml')
+    # add a cmodel.txt for a pdf file if the content model is ir:thesis and changes the title to thesis
+    genre = MD.find('mods:genre', ns)
+    if genre.text == genre_type:
+        if fnmatch.fnmatch(current_file, pattern):
+            title.text = genre_type
+            MD.write(numbered_sub_folder + '/MODS.xml')
+            cmodel_dot_txt = open(numbered_sub_folder + "/cmodel.txt", "w")
+            cmodel_dot_txt.write(thesis_text)
+            cmodel_dot_txt.close()
+
+
+            
 
 
 def change_all_filenames(dirPath):
     #changes all filenames to OBJ.ext, as specified for ingest into Islandora by the Islandora Rest Ingestor
+ 
     new_file_name = 'OBJ'
-    blacklist_ext = ['*.xml', '*.py', '*.xsl', '*.xpr']
+    blacklist = ['MODS.xml', 'cmodel.txt', '*.py', '*.xsl', '*.xpr']
+    #blacklist_ext = ['.xml', '*.py', '*.xsl', '*.xpr']
     for root, dirs, files in os.walk(dirPath):
         for name in files:
-            if fnmatch.fnmatch(name, '*.xml') or fnmatch.fnmatch(name, '*.py') or fnmatch.fnmatch(name, '*.xsl') or fnmatch.fnmatch(name, '*.xpr'):
-                pass
+            for ignorable in blacklist:
+                if fnmatch.fnmatch(name, ignorable):
+                    break
             else:
                 current_file = os.path.join(root, name)
                 filepath = os.path.split(current_file)[0]
