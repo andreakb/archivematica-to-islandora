@@ -91,7 +91,9 @@ def write_to_xml(current_file, numbered_sub_folder):
     MD.write(numbered_sub_folder + '/MODS.xml')
     # add a cmodel.txt for a pdf file if the content model is ir:thesis and changes the title to thesis
     genre = MD.find('mods:genre', ns)
-    if genre.text == genre_type:
+    if genre is None:
+    	pass
+    elif genre.text == genre_type:
         if fnmatch.fnmatch(current_file, pattern):
             title.text = genre_type
             MD.write(numbered_sub_folder + '/MODS.xml')
