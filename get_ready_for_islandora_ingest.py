@@ -110,7 +110,6 @@ def change_all_filenames(dirPath):
  
     new_file_name = 'OBJ'
     blacklist = ['MODS.xml', 'cmodel.txt', '*.py', '*.xsl', '*.xpr']
-    #blacklist_ext = ['.xml', '*.py', '*.xsl', '*.xpr']
     for root, dirs, files in os.walk(dirPath):
         for name in files:
             for ignorable in blacklist:
@@ -120,7 +119,6 @@ def change_all_filenames(dirPath):
                 current_file = os.path.join(root, name)
                 filepath = os.path.split(current_file)[0]
                 current_ext = os.path.splitext(name)[1]
-                #print "change " + current_file + "to " + filepath + '/' + new_file_name + current_ext
                 try:
                     os.rename(current_file, filepath + '/' + new_file_name + current_ext)
                 except OSError as e:
@@ -133,8 +131,6 @@ def change_all_filenames(dirPath):
 
 def main():
     #this function controls the script
-    
-    #add parser arguments
     parser = argparse.ArgumentParser(description= 'arranges objects and associated metadata for ingest into islandora via the islandora rest ingestor')
     parser.add_argument('inputDirectory', help='Path to the input directory.')
 
