@@ -28,8 +28,8 @@ def delete_mets(dirPath):
             if name.startswith('METS'):
                 os.remove(os.path.join(root, name))
 
-def find_sub_folders(dirPath):
-    #finds complex and multi-page objects and makes individual sub folders for each file and adds a mods fine for each individual file
+def find_sub_folders(dirPath, theses):
+    #finds compound and multi-page objects and makes individual sub folders for each file and adds a mods fine for each individual file
     pattern = dirPath + '/*/*'
 
     for root, dirs, files in os.walk(dirPath):
@@ -52,9 +52,7 @@ def find_sub_folders(dirPath):
                                 current_file = list_of_files[folder_name - 1]
                                 shutil.move(current_dir + "/" + current_file, numbered_sub_folder)
                                 shutil.copy(up_one_dir + "/MODS.xml", numbered_sub_folder + "/MODS.xml")
-                                #create_xml(current_file, numbered_sub_folder)
-                                write_to_xml(current_file, numbered_sub_folder)
-                                #print current_dir + "/" + list_of_files[folder_name - 1], numbered_sub_folder
+                                write_to_xml(current_file, numbered_sub_folder, theses)
                         shutil.rmtree(current_dir)
 
 
@@ -67,20 +65,22 @@ def make_sub_folders(new_dir_name):
             if e.errno != errno.EEXIST:
                 raise
 
-def write_to_xml(current_file, numbered_sub_folder):
+def write_to_xml(current_file, numbered_sub_folder, theses):
 # creates a title for the file in the subfolder using regex regular expressions to include either a string following a 
 #capitalized word or a page number. This is not perfect so check the titles as they are printed out. Replaces the objects
 #parent title with the title for filename in the MODS.xml. All other metadata stays the same. 
-#TO DO: MAKE GENRE/CMODEL/PATTER A DICTIONARY
+#TO DO: MAKE GENRE/CMODEL/PATTERN A DICTIONARY; MAKE XML HANDLING A CLASS 
     ns = {'mods' : 'http://www.loc.gov/mods/v3',
           'edt' :  'http://www.ndltd.org/standards/metadata/etdms/1.0'}
-    pattern = '*.pdf'
-    genre_type = "thesis"
+    #regular expression to find words in a filename to change to a tile
+    title_regex = '([A-Z])\w+[^.]*|p\d{2,3}|pg\d{2,3}'
+    #pattern for title of RPI thesis file derived from Proquest deliveries
+    thesis_pattern = '*_rpi_*.pdf'
+    #name of thesis content model in Islandora
     thesis_text = "ir:thesisCModel" 
 
-
-    regex = '([A-Z])\w+[^.]*|p\d{2,3}|pg\d{2,3}'
-    title_of_file = re.search(regex, current_file)
+    
+    title_of_file = re.search(title_regex, current_file)
     print "the title of " + current_file + " is " + title_of_file.group(0)
     #read and write to the MODS.xml
     MD = ET.parse(numbered_sub_folder + "/MODS.xml")
@@ -89,26 +89,22 @@ def write_to_xml(current_file, numbered_sub_folder):
     title = MD.find('mods:titleInfo/mods:title', ns)
     title.text = title_of_file.group(0)
     MD.write(numbered_sub_folder + '/MODS.xml')
-    # add a cmodel.txt for a pdf file if the content model is ir:thesis and changes the title to thesis
-    genre = MD.find('mods:genre', ns)
-    if genre is None:
-    	pass
-    elif genre.text == genre_type:
-        if fnmatch.fnmatch(current_file, pattern):
-            title.text = genre_type
+    # handles compound objects that are theses by adding a cmodel.txt to the directory of a thesis pdf and changing the title of the file to thesis
+    if theses == True:
+        if fnmatch.fnmatch(current_file, thesis_pattern):
+            title.text = 'thesis'
             MD.write(numbered_sub_folder + '/MODS.xml')
+            print "changing title of " + title_of_file.group(0) + " to " + title.text
             cmodel_dot_txt = open(numbered_sub_folder + "/cmodel.txt", "w")
             cmodel_dot_txt.write(thesis_text)
             cmodel_dot_txt.close()
-
-
-            
 
 
 def change_all_filenames(dirPath):
     #changes all filenames to OBJ.ext, as specified for ingest into Islandora by the Islandora Rest Ingestor
  
     new_file_name = 'OBJ'
+    # the blacklist filenames and extenstions won't be changed to OBJ.ext
     blacklist = ['MODS.xml', 'cmodel.txt', '*.py', '*.xsl', '*.xpr']
     for root, dirs, files in os.walk(dirPath):
         for name in files:
@@ -132,33 +128,27 @@ def change_all_filenames(dirPath):
 def main():
     #this function controls the script
     parser = argparse.ArgumentParser(description= 'arranges objects and associated metadata for ingest into islandora via the islandora rest ingestor')
-    parser.add_argument('inputDirectory', help='Path to the input directory.')
+    #parser.add_argument('inputDirectory', help='Path to the input directory.')
+    parser.add_argument('--input', '-i', default='.', help='Path to the input directory. Default is the current directory')
+    parser.add_argument('--theses', '--thesis','-t', default=False, help='flags objects in directory as theses', action="store_true")
+    
 
-    numArgs = len(sys.argv)
-
-    if numArgs > 2:
-        print "ERROR. Command takes one argument: the path to the input directory. The default is to assign the current directory as the input directory"
+    args = parser.parse_args()
+    
+    if not os.path.exists(args.input):
+        print 'Filepath does not exist'
         parser.print_help()
         sys.exit()
-    elif numArgs == 1:
-        enteredPath = '.'
-    else:
-        enteredPath = sys.argv[1]
-        
-        if not os.path.exists(enteredPath):
-            print 'Filepath does not exist'
-            parser.print_help()
-            sys.exit()
-        elif not os.path.isdir(enteredPath):
-            print 'Filepath is not a directory'
-            parser.print_help()
-            sys.exit()
-    
+    elif not os.path.isdir(args.input):
+        print 'Filepath is not a directory'
+        parser.print_help()
+        sys.exit()
     #normalize path name
-    dirPath = os.path.abspath(enteredPath)
+    dirPath = os.path.abspath(args.input)
+
     
     delete_mets(dirPath)
-    find_sub_folders(dirPath)
+    find_sub_folders(dirPath, args.theses)
     change_all_filenames(dirPath)
 
 
