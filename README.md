@@ -33,7 +33,7 @@ main-directory/
 
 ### step 3:  massage folder structure for ingest into Islandora
 
-`get_ready_for_islandora_ingest.py` alters the folder structure for ingest into Islandora. The script is written to assume that, after the first two steps, the folder structure looks like this:
+`get_ready_for_islandora_ingest.py` alters the folder structure for ingest into Islandora. It takes two optional arguments" `--input[/path/to/dir]` to enter the path to the input directory, and `--theses`, which flags that objects in directory are theses. The script is written to assume that, after the first two steps, the folder structure looks like this:
 
 ```
 main-directory/
