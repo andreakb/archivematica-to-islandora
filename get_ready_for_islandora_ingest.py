@@ -18,7 +18,13 @@ import re
 import sys
 import argparse
 
-
+def redirect_to_file(text, dirPath):
+# add title change statement to a log   
+    original = sys.stdout
+    sys.stdout = open(dirPath + '/title_log.txt', 'a')
+    print(text)
+    sys.stdout = original
+    print text
 
 
 def delete_mets(dirPath):
@@ -52,7 +58,7 @@ def find_sub_folders(dirPath, theses):
                                 current_file = list_of_files[folder_name - 1]
                                 shutil.move(current_dir + "/" + current_file, numbered_sub_folder)
                                 shutil.copy(up_one_dir + "/MODS.xml", numbered_sub_folder + "/MODS.xml")
-                                write_to_xml(current_file, numbered_sub_folder, theses)
+                                write_to_xml(current_file, numbered_sub_folder, theses, dirPath)
                         shutil.rmtree(current_dir)
 
 
@@ -65,7 +71,7 @@ def make_sub_folders(new_dir_name):
             if e.errno != errno.EEXIST:
                 raise
 
-def write_to_xml(current_file, numbered_sub_folder, theses):
+def write_to_xml(current_file, numbered_sub_folder, theses, dirPath):
 # creates a title for the file in the subfolder using regex regular expressions to include either a string following a 
 #capitalized word or a page number. This is not perfect so check the titles as they are printed out. Replaces the objects
 #parent title with the title for filename in the MODS.xml. All other metadata stays the same. 
@@ -73,7 +79,8 @@ def write_to_xml(current_file, numbered_sub_folder, theses):
     ns = {'mods' : 'http://www.loc.gov/mods/v3',
           'edt' :  'http://www.ndltd.org/standards/metadata/etdms/1.0'}
     #regular expression to find words in a filename to change to a tile
-    title_regex = '([A-Z])\w+[^.]*|p\d{2,3}|pg\d{2,3}'
+    #title_regex = '([A-Z])\w+[^.]*|p\d{2,3}|pg\d{2,3}'
+    title_regex = '([A-Z])\w+[^.]*|p\d{2,3}|pg\d{2,3}(?!_)'
     #pattern for title of RPI thesis file derived from Proquest deliveries
     thesis_pattern = '*_rpi_*.pdf'
     #name of thesis content model in Islandora
@@ -81,7 +88,7 @@ def write_to_xml(current_file, numbered_sub_folder, theses):
 
     
     title_of_file = re.search(title_regex, current_file)
-    print "the title of " + current_file + " is " + title_of_file.group(0)
+    redirect_to_file("the title of " + current_file + " is " + title_of_file.group(0), dirPath)
     #read and write to the MODS.xml
     MD = ET.parse(numbered_sub_folder + "/MODS.xml")
     for prefix, uri in ns.iteritems():
@@ -94,7 +101,7 @@ def write_to_xml(current_file, numbered_sub_folder, theses):
         if fnmatch.fnmatch(current_file, thesis_pattern):
             title.text = 'thesis'
             MD.write(numbered_sub_folder + '/MODS.xml')
-            print "changing title of " + title_of_file.group(0) + " to " + title.text
+            redirect_to_file("changing title of " + title_of_file.group(0) + " to " + title.text, dirPath)
             cmodel_dot_txt = open(numbered_sub_folder + "/cmodel.txt", "w")
             cmodel_dot_txt.write(thesis_text)
             cmodel_dot_txt.close()
@@ -105,7 +112,7 @@ def change_all_filenames(dirPath):
  
     new_file_name = 'OBJ'
     # the blacklist filenames and extenstions won't be changed to OBJ.ext
-    blacklist = ['MODS.xml', 'cmodel.txt', '*.py', '*.xsl', '*.xpr']
+    blacklist = ['MODS.xml', 'cmodel.txt', '*.py', '*.xsl', '*.xpr', 'title_log.txt']
     for root, dirs, files in os.walk(dirPath):
         for name in files:
             for ignorable in blacklist:
