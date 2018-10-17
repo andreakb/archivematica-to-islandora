@@ -22,7 +22,7 @@
             <mods:titleInfo>
             <!-- map  dc:title to mods:title -->
                  <mods:title>
-                      <xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:title" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/"/>
+                      <xsl:value-of select="mets:dmdSec[1]/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:title" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/"/>
                  </mods:title>
             </mods:titleInfo>
             <!-- if dc:creator exists, map every dc:creator name to mods:namePart and creator for mods:roleTerm  -->
@@ -151,8 +151,8 @@
                 </xsl:for-each>
            </xsl:if>
            <!-- if dc:subject exists map each value to mods:topic in the mods:subject element -->
-           <xsl:if test="mets:dmdSec/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:subject!=''">
-                <xsl:for-each select="mets:dmdSec/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:subject[text() != '']">
+           <xsl:if test="mets:dmdSec[1]/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:subject!=''">
+                <xsl:for-each select="mets:dmdSec[1]/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:subject[text() != '']">
                      <mods:subject>
                           <mods:topic>
                                <xsl:value-of select="."/>
@@ -180,8 +180,8 @@
            </xsl:if>
            <mods:originInfo>
                <!-- if the field dc:created exists map value to  mods:originInfo subelement dateIssued -->
-               <xsl:if test="mets:dmdSec/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:created!=''">
-                   <xsl:for-each select="mets:dmdSec/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:created[text() != '']">
+               <xsl:if test="mets:dmdSec[1]/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:created!=''">
+                   <xsl:for-each select="mets:dmdSec[1]/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:created[text() != '']">
                         <mods:dateIssued>
                              <xsl:value-of select="."/>
                         </mods:dateIssued>
@@ -256,8 +256,8 @@
                </xsl:if>
            </mods:relatedItem>
            <!-- if the field dcterms:source exists map value to mods:relatedItem with the type otherFormat subelement title -->
-           <xsl:if test="mets:dmdSec/mets:mdWrap/mets:xmlData/dcterms:dublincore/dcterms:source!=''">
-               <xsl:for-each select="mets:dmdSec/mets:mdWrap/mets:xmlData/dcterms:dublincore/dcterms:source[text() != '']">
+           <xsl:if test="mets:dmdSec[1]/mets:mdWrap/mets:xmlData/dcterms:dublincore/dcterms:source!=''">
+               <xsl:for-each select="mets:dmdSec[1]/mets:mdWrap/mets:xmlData/dcterms:dublincore/dcterms:source[text() != '']">
                     <mods:relatedItem type="otherFormat">
                          <mods:titleInfo>
                               <mods:title>
@@ -267,9 +267,9 @@
                     </mods:relatedItem>
                </xsl:for-each>
            </xsl:if>
-           <!-- if the field dc:source exists map value to mods:relatedItem with the type otherFormat subelement title -->
-           <xsl:if test="mets:dmdSec/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:source!=''">
-               <xsl:for-each select="mets:dmdSec/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:source[text() != '']">
+           <!-- if the field dc:source exists map value to mods:relatedItem with the type otherFormat subelement title 
+           <xsl:if test="mets:dmdSec[1]/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:source!=''">
+               <xsl:for-each select="mets:dmdSec[1]/mets:mdWrap/mets:xmlData/dcterms:dublincore/dc:source[text() != '']">
                    <mods:relatedItem type="otherFormat">
                        <mods:titleInfo>
                            <mods:title>
@@ -278,7 +278,7 @@
                        </mods:titleInfo>
                    </mods:relatedItem>
                </xsl:for-each>
-           </xsl:if> 
+           </xsl:if>--> 
          </mods:mods>
        </xsl:template>
         <xsl:template match="/">
