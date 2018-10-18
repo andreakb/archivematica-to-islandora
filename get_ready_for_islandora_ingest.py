@@ -112,7 +112,7 @@ def change_all_filenames(dirPath):
  
     new_file_name = 'OBJ'
     # the blacklist filenames and extenstions won't be changed to OBJ.ext
-    blacklist = ['MODS.xml', 'cmodel.txt', '*.py', '*.xsl', '*.xpr', 'title_log.txt']
+    blacklist = ['MODS.xml', 'cmodel.txt', '*.py', '*.xsl', '*.xpr', 'title_log.txt', '*.md']
     for root, dirs, files in os.walk(dirPath):
         for name in files:
             for ignorable in blacklist:
